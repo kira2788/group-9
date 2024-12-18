@@ -22,8 +22,8 @@ class CPU_Scheduler:
         return schedule
 
     def SJF(self):
-        # Shortest Job First (SJF) scheduling algorithm
-        tasks = sorted(self.tasks, key=lambda x: x['burst_time'])
+        # Shortest Job First (SJF) with priority for arrival_time = 0
+        tasks = sorted(self.tasks, key=lambda x: (x['arrival_time'] != 0, x['burst_time'], x['arrival_time']))
         schedule = []
         current_time = 0
         for task in tasks:
@@ -61,7 +61,7 @@ class CPU_Scheduler:
 
 
 def visualize_schedule(schedule, algorithm):
-    # 检查 schedule 内容
+    # check schedule content
     print("Schedule:", schedule)
 
     tasks = [entry['task'] for entry in schedule if 'task' in entry]
@@ -105,7 +105,14 @@ def calculate_schedule():
     if result:
         output_text.insert(tk.END, "Schedule Result:\n")
         for item in result:
-            output_text.insert(tk.END, f"{item}\n")
+            # 获取对应的任务详细信息
+            task_info = next(task for task in scheduler.tasks if task['name'] == item['task'])
+            output_text.insert(
+                tk.END,
+                f"Task: {item['task']}, Arrival Time: {task_info['arrival_time']}, "
+                f"Burst Time: {task_info['burst_time']}, Priority: {task_info['priority']}, "
+                f"Completion Time: {item['time']}\n"
+            )
 
         # Visualize the results with a bar plot
         visualize_schedule(result, selected_algorithm)
